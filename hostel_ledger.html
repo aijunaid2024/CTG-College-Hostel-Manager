@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> Chittagong College Hostel Ledger — Meal & Finance Manager</title>
+<style>
+:root{--bg:#f4f6fb;--panel:#fff;--ink:#172033;--muted:#697386;--line:#e6eaf1;--primary:#3157d5;--green:#13845b;--red:#c43d4b;--amber:#a66b08;--shadow:0 8px 28px rgba(24,39,75,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+header{background:#172554;color:#fff;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.brand{font-size:20px;font-weight:800;letter-spacing:.2px}.brand small{display:block;font-size:12px;font-weight:500;color:#c7d2fe}
+.wrap{max-width:1400px;margin:auto;padding:22px}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+nav button,.btn{border:0;border-radius:9px;padding:10px 14px;background:#e9edfb;color:#23366e;font-weight:700;cursor:pointer}
+nav button.active,.btn.primary{background:var(--primary);color:white}
+.btn.secondary{background:#eef1f6;color:#334155}.btn.danger{background:#feecee;color:#a32131}.btn.small{padding:6px 9px;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:17px;box-shadow:var(--shadow)}
+.metric .label{color:var(--muted);font-size:12px;font-weight:700}.metric .value{font-size:25px;font-weight:800;margin-top:6px}.metric .hint{font-size:12px;color:var(--muted);margin-top:3px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}
+h2{font-size:18px;margin:0 0 14px}h3{font-size:15px;margin:0 0 10px}
+.muted{color:var(--muted)}.green{color:var(--green)}.red{color:var(--red)}.amber{color:var(--amber)}
+.section{display:none}.section.active{display:block}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:13px}
+input,select,textarea{font:inherit;border:1px solid #d8deea;border-radius:8px;padding:10px 11px;background:white;color:var(--ink);min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid #c7d2fe;border-color:var(--primary)}
+.toolbar input{flex:1;min-width:180px}
+table{width:100%;border-collapse:collapse;white-space:nowrap}th,td{padding:11px 10px;text-align:left;border-bottom:1px solid var(--line)}th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);background:#fafbfe}td{font-size:13px}tr:last-child td{border-bottom:0}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px}
+.pill{display:inline-block;border-radius:99px;padding:3px 8px;font-size:11px;font-weight:800;background:#edf1f7;color:#475569}.pill.paid{background:#e5f6ee;color:#08734b}.pill.due{background:#fff2dc;color:#9a6200}
+.formgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:12px;color:var(--muted);font-weight:700}.field input,.field select{width:100%}
+.actions{display:flex;gap:7px;flex-wrap:wrap}
+.empty{text-align:center;padding:30px;color:var(--muted)}
+.note{background:#eff5ff;border:1px solid #d9e6ff;color:#29457c;padding:11px 13px;border-radius:9px;margin-bottom:14px;font-size:12px}
+.modal{display:none;position:fixed;inset:0;background:#0f172a88;z-index:10;padding:18px;overflow:auto}.modal.show{display:grid;place-items:center}
+.modalbox{background:white;border-radius:15px;padding:20px;width:min(700px,100%);max-height:92vh;overflow:auto;box-shadow:0 20px 60px #0003}
+.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.toast{position:fixed;bottom:20px;right:20px;background:#172554;color:white;padding:12px 16px;border-radius:10px;display:none;z-index:20;box-shadow:var(--shadow)}
+.smalltext{font-size:12px}.right{text-align:right}.negative{color:var(--red);font-weight:800}
+footer{padding:24px;text-align:center;color:var(--muted);font-size:12px}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.wrap{padding:13px}header{padding:15px}.grid{gap:9px}.metric .value{font-size:20px}.formgrid{grid-template-columns:1fr}.card,.panel{padding:13px}nav{gap:6px}nav button{padding:9px 10px;font-size:12px}}
+@media print{header,nav,.toolbar,.no-print,footer{display:none!important}.section{display:none!important}.section.active{display:block!important}.wrap{padding:0}.card,.panel{box-shadow:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">🏠 Hostel Ledger <small>College Hostel · Meal & Finance Manager</small></div>
+  <div class="row"><span id="todayLabel"></span><button class="btn secondary" onclick="openBackup()">Backup / Restore</button></div>
+</header>
+<div class="wrap">
+<nav class="no-print">
+<button class="active" data-tab="dashboard">Dashboard</button>
+<button data-tab="students">Students</button>
+<button data-tab="payments">Payments</button>
+<button data-tab="charges">Meal Charges</button>
+<button data-tab="expenses">Expenses</button>
+<button data-tab="reports">Reports</button>
+</nav>
+
+<section id="dashboard" class="section active">
+ <div class="grid">
+  <div class="card metric"><div class="label">ACTIVE STUDENTS</div><div class="value" id="mStudents">0</div><div class="hint">Registered students</div></div>
+  <div class="card metric"><div class="label">TOTAL PAYMENTS</div><div class="value green" id="mPayments">৳0</div><div class="hint">Money collected</div></div>
+  <div class="card metric"><div class="label">MEAL CHARGES</div><div class="value" id="mCharges">৳0</div><div class="hint">Charges assigned</div></div>
+  <div class="card metric"><div class="label">TOTAL DUE</div><div class="value red" id="mDue">৳0</div><div class="hint">Unpaid student balances</div></div>
+ </div>
+ <div class="grid">
+  <div class="card metric"><div class="label">HOSTEL EXPENSES</div><div class="value red" id="mExpenses">৳0</div><div class="hint">Recorded expenses</div></div>
+  <div class="card metric"><div class="label">CASH POSITION</div><div class="value" id="mCash">৳0</div><div class="hint">Payments minus expenses</div></div>
+  <div class="card metric"><div class="label">STUDENTS WITH DUE</div><div class="value amber" id="mDueCount">0</div><div class="hint">Need payment follow-up</div></div>
+  <div class="card metric"><div class="label">TRANSACTIONS</div><div class="value" id="mTransactions">0</div><div class="hint">Payments + expenses</div></div>
+ </div>
+ <div class="panel">
+  <div class="row between"><h2>Recent activity</h2><button class="btn secondary small" onclick="showTab('reports')">View reports</button></div>
+  <div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Details</th><th>Amount</th></tr></thead><tbody id="recentRows"></tbody></table></div>
+ </div>
+ <p class="note" style="margin-top:14px">Accounting note: student payments increase hostel collections; meal charges create student dues. Expenses reduce the cash position. A student's due is calculated as meal charges minus payments.</p>
+</section>
+
+<section id="students" class="section">
+ <div class="row between"><h2>Student register</h2><div class="actions no-print"><button class="btn secondary" onclick="downloadStudentCSV()">Export students CSV</button><button class="btn primary" onclick="openStudent()">+ Add student</button></div></div>
+ <div class="toolbar"><input id="studentSearch" placeholder="Search by roll, name or room..." oninput="renderStudents()"><select id="studentStatus" onchange="renderStudents()"><option value="all">All students</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="due">Students with due</option></select></div>
+ <div class="table-wrap"><table><thead><tr><th>Roll</th><th>Student name</th><th>Room</th><th>Phone</th><th>Total charged</th><th>Paid</th><th>Due</th><th>Status</th><th class="no-print">Actions</th></tr></thead><tbody id="studentRows"></tbody></table></div>
+</section>
+
+<section id="payments" class="section">
+ <div class="row between"><h2>Student payments</h2><button class="btn primary no-print" onclick="openPayment()">+ Record payment</button></div>
+ <div class="toolbar"><input id="paymentSearch" placeholder="Search roll, student or note..." oninput="renderPayments()"><input type="month" id="paymentMonth" onchange="renderPayments()"><button class="btn secondary" onclick="document.getElementById('paymentMonth').value='';renderPayments()">Clear month</button></div>
+ <div class="table-wrap"><table><thead><tr><th>Date</th><th>Roll</th><th>Student</th><th>Method</th><th>Note</th><th>Amount</th><th class="no-print">Action</th></tr></thead><tbody id="paymentRows"></tbody></table></div>
+</section>
+
+<section id="charges" class="section">
+ <div class="row between"><h2>Meal charges</h2><button class="btn primary no-print" onclick="openCharge()">+ Add meal charge</button></div>
+ <div class="note">Add a charge for an individual student or apply the same monthly charge to all active students. Charges are separate from payments.</div>
+ <div class="toolbar"><input id="chargeSearch" placeholder="Search student or roll..." oninput="renderCharges()"><input type="month" id="chargeMonth" onchange="renderCharges()"><button class="btn secondary" onclick="document.getElementById('chargeMonth').value='';renderCharges()">Clear month</button></div>
+ <div class="table-wrap"><table><thead><tr><th>Date</th><th>Period</th><th>Roll</th><th>Student</th><th>Description</th><th>Amount</th><th class="no-print">Action</th></tr></thead><tbody id="chargeRows"></tbody></table></div>
+</section>
+
+<section id="expenses" class="section">
+ <div class="row between"><h2>Hostel expenses</h2><button class="btn primary no-print" onclick="openExpense()">+ Add expense</button></div>
+ <div class="toolbar"><input id="expenseSearch" placeholder="Search category or description..." oninput="renderExpenses()"><input type="month" id="expenseMonth" onchange="renderExpenses()"><button class="btn secondary" onclick="document.getElementById('expenseMonth').value='';renderExpenses()">Clear month</button></div>
+ <div class="table-wrap"><table><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Paid from</th><th>Amount</th><th class="no-print">Action</th></tr></thead><tbody id="expenseRows"></tbody></table></div>
+</section>
+
+<section id="reports" class="section">
+ <div class="row between"><h2>Financial reports</h2><div class="actions no-print"><button class="btn secondary" onclick="window.print()">Print report</button><button class="btn secondary" onclick="downloadReportCSV()">Export report CSV</button></div></div>
+ <div class="toolbar"><input type="month" id="reportMonth" onchange="renderReports()"><button class="btn secondary" onclick="document.getElementById('reportMonth').value='';renderReports()">All time</button></div>
+ <div class="grid">
+  <div class="card metric"><div class="label">COLLECTED</div><div class="value green" id="rPaid">৳0</div></div>
+  <div class="card metric"><div class="label">MEAL CHARGES</div><div class="value" id="rCharge">৳0</div></div>
+  <div class="card metric"><div class="label">EXPENSES</div><div class="value red" id="rExpense">৳0</div></div>
+  <div class="card metric"><div class="label">NET CASH FLOW</div><div class="value" id="rNet">৳0</div></div>
+ </div>
+ <div class="panel"><h3>Student dues</h3><div class="table-wrap"><table><thead><tr><th>Roll</th><th>Name</th><th>Charges</th><th>Paid</th><th>Due</th></tr></thead><tbody id="dueRows"></tbody></table></div></div>
+</section>
+</div>
+<footer>Hostel Ledger · Local browser version · Back up your data regularly</footer>
+
+<div class="modal" id="modal"><div class="modalbox"><div class="modalhead"><h2 id="modalTitle">Form</h2><button class="btn secondary" onclick="closeModal()">✕</button></div><div id="modalBody"></div></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const KEY='hostel_ledger_v1';
+let db={students:[],payments:[],charges:[],expenses:[]};
+const money=n=>'৳'+Number(n||0).toLocaleString('en-BD',{maximumFractionDigits:2});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>new Date().toISOString().slice(0,10);
+const monthOf=d=>String(d||'').slice(0,7);
+const sum=a=>a.reduce((t,x)=>t+Number(x.amount||0),0);
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x)db={...db,...x}}catch(e){alert('Saved data could not be read. Restore from a backup if you have one.')} }
+function save(){localStorage.setItem(KEY,JSON.stringify(db));renderAll()}
+function toast(s){let t=document.getElementById('toast');t.textContent=s;t.style.display='block';setTimeout(()=>t.style.display='none',2400)}
+function showTab(id){document.querySelectorAll('.section').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));renderAll()}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+function student(roll){return db.students.find(s=>s.roll===roll)}
+function totals(roll){let c=sum(db.charges.filter(x=>x.roll===roll)),p=sum(db.payments.filter(x=>x.roll===roll));return {c,p,d:c-p}}
+function activeStudents(){return db.students.filter(s=>s.status!=='Inactive')}
+function openModal(title,body){document.getElementById('modalTitle').textContent=title;document.getElementById('modalBody').innerHTML=body;document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function field(label,name,type='text',value='',required=true,extra=''){return `<div class="field"><label>${label}</label><input name="${name}" type="${type}" value="${esc(value)}" ${required?'required':''} ${extra}></div>`}
+function studentOptions(selected=''){return `<option value="">Choose student</option>`+activeStudents().map(s=>`<option value="${esc(s.roll)}" ${s.roll===selected?'selected':''}>${esc(s.roll)} — ${esc(s.name)}</option>`).join('')}
+function formSubmit(form,fn){form.addEventListener('submit',e=>{e.preventDefault();fn(Object.fromEntries(new FormData(form).entries()))})}
+function openStudent(s=null){
+ const editing=!!s;
+ openModal(editing?'Edit student':'Add student',`<form id="studentForm"><div class="formgrid">
+ ${field('Roll number','roll','text',s?.roll||'',true,editing?'readonly':'')}
+ ${field('Full name','name','text',s?.name||'')}
+ ${field('Room number','room','text',s?.room||'',false)}
+ ${field('Phone number','phone','tel',s?.phone||'',false)}
+ <div class="field"><label>Status</label><select name="status"><option ${!s||s.status!=='Inactive'?'selected':''}>Active</option><option ${s?.status==='Inactive'?'selected':''}>Inactive</option></select></div>
+ </div><div class="actions" style="margin-top:18px"><button class="btn primary">Save student</button><button type="button" class="btn secondary" onclick="closeModal()">Cancel</button></div></form>`);
+ formSubmit(document.getElementById('studentForm'),v=>{if(!editing&&student(v.roll)){toast('This roll number already exists');return}if(editing)Object.assign(s,v);else db.students.push(v);save();closeModal();toast('Student saved')});
+}
+function openPayment(){
+ openModal('Record student payment',`<form id="paymentForm"><div class="formgrid">
+ <div class="field"><label>Student</label><select name="roll" required>${studentOptions()}</select></div>
+ ${field('Payment date','date','date',today())}${field('Amount (৳)','amount','number','',true,'min="0.01" step="0.01"')}
+ <div class="field"><label>Payment method</label><select name="method"><option>Cash</option><option>bKash</option><option>Nagad</option><option>Bank</option><option>Other</option></select></div>
+ ${field('Note / receipt no.','note','text','',false)}
+ </div><div class="actions" style="margin-top:18px"><button class="btn primary">Save payment</button><button type="button" class="btn secondary" onclick="closeModal()">Cancel</button></div></form>`);
+ formSubmit(document.getElementById('paymentForm'),v=>{v.amount=Number(v.amount);if(v.amount<=0)return toast('Enter a valid amount');db.payments.push({id:crypto.randomUUID(),...v});save();closeModal();toast('Payment recorded')});
+}
+function openCharge(){
+ openModal('Add meal charge',`<form id="chargeForm"><div class="formgrid">
+ <div class="field"><label>Apply to</label><select name="scope" id="chargeScope" onchange="document.getElementById('singleStudent').style.display=this.value==='one'?'block':'none'"><option value="one">One student</option><option value="all">All active students</option></select></div>
+ <div class="field" id="singleStudent"><label>Student</label><select name="roll">${studentOptions()}</select></div>
+ ${field('Charge date','date','date',today())}${field('Month / period (e.g. 2026-10)','period','month',monthOf(today()))}
+ ${field('Amount per student (৳)','amount','number','',true,'min="0.01" step="0.01"')}
+ ${field('Description','description','text','Monthly meal charge')}
+ </div><p class="note" style="margin-top:12px">For “All active students”, one charge will be created for each active student. Check the student list first to avoid duplicate monthly charges.</p><div class="actions"><button class="btn primary">Save charge(s)</button><button type="button" class="btn secondary" onclick="closeModal()">Cancel</button></div></form>`);
+ formSubmit(document.getElementById('chargeForm'),v=>{let amount=Number(v.amount);if(amount<=0)return toast('Enter a valid amount');let targets=v.scope==='all'?activeStudents():[student(v.roll)].filter(Boolean);if(!targets.length)return toast('No students selected');let period=v.period||monthOf(v.date);let duplicate=targets.filter(s=>db.charges.some(c=>c.roll===s.roll&&c.period===period&&c.description===v.description));if(duplicate.length&&!confirm(`${duplicate.length} student(s) already have a matching charge for ${period}. Add another charge anyway?`))return;targets.forEach(s=>db.charges.push({id:crypto.randomUUID(),roll:s.roll,date:v.date,period,amount,description:v.description}));save();closeModal();toast(`${targets.length} charge(s) added`)});
+}
+function openExpense(){
+ openModal('Add hostel expense',`<form id="expenseForm"><div class="formgrid">
+ ${field('Date','date','date',today())}
+ <div class="field"><label>Category</label><select name="category"><option>Rice & groceries</option><option>Vegetables</option><option>Fish & meat</option><option>Gas / cooking</option><option>Electricity</option><option>Water</option><option>Staff salary</option><option>Repairs</option><option>Other</option></select></div>
+ ${field('Amount (৳)','amount','number','',true,'min="0.01" step="0.01"')}
+ ${field('Description','description','text','',false)}
+ <div class="field"><label>Paid from</label><select name="account"><option>Cash</option><option>Bank</option><option>bKash</option><option>Nagad</option><option>Other</option></select></div>
+ </div><div class="actions" style="margin-top:18px"><button class="btn primary">Save expense</button><button type="button" class="btn secondary" onclick="closeModal()">Cancel</button></div></form>`);
+ formSubmit(document.getElementById('expenseForm'),v=>{v.amount=Number(v.amount);if(v.amount<=0)return toast('Enter a valid amount');db.expenses.push({id:crypto.randomUUID(),...v});save();closeModal();toast('Expense recorded')});
+}
+function removeItem(type,id){if(!confirm('Delete this record? This will change the totals.'))return;db[type]=db[type].filter(x=>x.id!==id);save();toast('Record deleted')}
+function renderDashboard(){
+ let p=sum(db.payments),c=sum(db.charges),e=sum(db.expenses),due=db.students.map(s=>totals(s.roll)).filter(t=>t.d>0);
+ document.getElementById('mStudents').textContent=activeStudents().length;document.getElementById('mPayments').textContent=money(p);document.getElementById('mCharges').textContent=money(c);document.getElementById('mDue').textContent=money(c-p);document.getElementById('mExpenses').textContent=money(e);document.getElementById('mCash').textContent=money(p-e);document.getElementById('mDueCount').textContent=due.length;document.getElementById('mTransactions').textContent=db.payments.length+db.expenses.length;
+ let all=[...db.payments.map(x=>({...x,type:'Payment',details:student(x.roll)?.name||x.roll})),...db.expenses.map(x=>({...x,type:'Expense',details:x.category+' — '+(x.description||'')}))].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
+ document.getElementById('recentRows').innerHTML=all.length?all.map(x=>`<tr><td>${esc(x.date)}</td><td><span class="pill ${x.type==='Payment'?'paid':'due'}">${x.type}</span></td><td>${esc(x.details)}</td><td>${money(x.amount)}</td></tr>`).join(''):`<tr><td colspan="4" class="empty">No activity yet. Add students, charges and payments to begin.</td></tr>`;
+}
+function renderStudents(){
+ let q=(document.getElementById('studentSearch')?.value||'').toLowerCase(),st=document.getElementById('studentStatus')?.value||'all';
+ let list=db.students.filter(s=>[s.roll,s.name,s.room,s.phone].join(' ').toLowerCase().includes(q)).filter(s=>st==='all'||(st==='active'?s.status!=='Inactive':st==='inactive'?s.status==='Inactive':totals(s.roll).d>0)).sort((a,b)=>a.roll.localeCompare(b.roll,undefined,{numeric:true}));
+ document.getElementById('studentRows').innerHTML=list.length?list.map(s=>{let t=totals(s.roll);return `<tr><td><b>${esc(s.roll)}</b></td><td>${esc(s.name)}</td><td>${esc(s.room||'—')}</td><td>${esc(s.phone||'—')}</td><td>${money(t.c)}</td><td class="green">${money(t.p)}</td><td class="${t.d>0?'negative':'green'}">${money(t.d)}</td><td><span class="pill ${s.status==='Inactive'?'':'paid'}">${esc(s.status||'Active')}</span></td><td class="no-print"><div class="actions"><button class="btn small secondary" onclick="studentLedger('${encodeURIComponent(s.roll)}')">Ledger</button><button class="btn small secondary" onclick="editStudent('${encodeURIComponent(s.roll)}')">Edit</button></div></td></tr>`}).join(''):`<tr><td colspan="9" class="empty">No students found.</td></tr>`;
+}
+function editStudent(r){let s=student(decodeURIComponent(r));if(s)openStudent(s)}
+function studentLedger(r){let s=student(decodeURIComponent(r)),t=totals(s.roll);let rows=[...db.charges.filter(x=>x.roll===s.roll).map(x=>({...x,type:'Charge'})),...db.payments.filter(x=>x.roll===s.roll).map(x=>({...x,type:'Payment'}))].sort((a,b)=>a.date.localeCompare(b.date));openModal('Student ledger — '+s.name,`<div class="grid" style="grid-template-columns:repeat(3,1fr)"><div class="card"><div class="muted">Charged</div><b>${money(t.c)}</b></div><div class="card"><div class="muted">Paid</div><b class="green">${money(t.p)}</b></div><div class="card"><div class="muted">Due</div><b class="red">${money(t.d)}</b></div></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Amount</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x.date)}</td><td>${x.type}</td><td>${esc(x.description||x.note||'')}</td><td>${money(x.amount)}</td></tr>`).join('')||'<tr><td colspan="4" class="empty">No transactions</td></tr>'}</tbody></table></div>`)}
+function renderPayments(){let q=(document.getElementById('paymentSearch')?.value||'').toLowerCase(),m=document.getElementById('paymentMonth')?.value||'';let a=db.payments.filter(x=>(!m||monthOf(x.date)===m)&&[x.roll,student(x.roll)?.name,x.note,x.method].join(' ').toLowerCase().includes(q)).sort((a,b)=>b.date.localeCompare(a.date));document.getElementById('paymentRows').innerHTML=a.length?a.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.roll)}</td><td>${esc(student(x.roll)?.name||'Unknown student')}</td><td>${esc(x.method)}</td><td>${esc(x.note||'—')}</td><td class="green">${money(x.amount)}</td><td class="no-print"><button class="btn small danger" onclick="removeItem('payments','${x.id}')">Delete</button></td></tr>`).join(''):`<tr><td colspan="7" class="empty">No payments found.</td></tr>`}
+function renderCharges(){let q=(document.getElementById('chargeSearch')?.value||'').toLowerCase(),m=document.getElementById('chargeMonth')?.value||'';let a=db.charges.filter(x=>(!m||x.period===m||monthOf(x.date)===m)&&[x.roll,student(x.roll)?.name,x.description].join(' ').toLowerCase().includes(q)).sort((a,b)=>b.date.localeCompare(a.date));document.getElementById('chargeRows').innerHTML=a.length?a.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.period||'—')}</td><td>${esc(x.roll)}</td><td>${esc(student(x.roll)?.name||'Unknown student')}</td><td>${esc(x.description||'')}</td><td>${money(x.amount)}</td><td class="no-print"><button class="btn small danger" onclick="removeItem('charges','${x.id}')">Delete</button></td></tr>`).join(''):`<tr><td colspan="7" class="empty">No charges found.</td></tr>`}
+function renderExpenses(){let q=(document.getElementById('expenseSearch')?.value||'').toLowerCase(),m=document.getElementById('expenseMonth')?.value||'';let a=db.expenses.filter(x=>(!m||monthOf(x.date)===m)&&[x.category,x.description,x.account].join(' ').toLowerCase().includes(q)).sort((a,b)=>b.date.localeCompare(a.date));document.getElementById('expenseRows').innerHTML=a.length?a.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.category)}</td><td>${esc(x.description||'—')}</td><td>${esc(x.account)}</td><td class="red">${money(x.amount)}</td><td class="no-print"><button class="btn small danger" onclick="removeItem('expenses','${x.id}')">Delete</button></td></tr>`).join(''):`<tr><td colspan="6" class="empty">No expenses found.</td></tr>`}
+function renderReports(){let m=document.getElementById('reportMonth')?.value||'',p=sum(db.payments.filter(x=>!m||monthOf(x.date)===m)),c=sum(db.charges.filter(x=>!m||x.period===m||monthOf(x.date)===m)),e=sum(db.expenses.filter(x=>!m||monthOf(x.date)===m));document.getElementById('rPaid').textContent=money(p);document.getElementById('rCharge').textContent=money(c);document.getElementById('rExpense').textContent=money(e);document.getElementById('rNet').textContent=money(p-e);let rows=db.students.map(s=>({s,t:totals(s.roll)})).filter(x=>x.t.d>0).sort((a,b)=>b.t.d-a.t.d);document.getElementById('dueRows').innerHTML=rows.length?rows.map(x=>`<tr><td>${esc(x.s.roll)}</td><td>${esc(x.s.name)}</td><td>${money(x.t.c)}</td><td>${money(x.t.p)}</td><td class="negative">${money(x.t.d)}</td></tr>`).join(''):`<tr><td colspan="5" class="empty">No outstanding student dues.</td></tr>`}
+function renderAll(){renderDashboard();renderStudents();renderPayments();renderCharges();renderExpenses();renderReports()}
+function download(name,content,type='text/plain'){let a=document.createElement('a'),u=URL.createObjectURL(new Blob([content],{type}));a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
+function openBackup(){openModal('Backup & restore',`<p>All records are currently stored in this browser on this device. Download a backup regularly, especially before clearing browser data.</p><div class="actions"><button class="btn primary" onclick="backup()">Download full backup (JSON)</button><button class="btn secondary" onclick="document.getElementById('restoreFile').click()">Restore from backup</button><input id="restoreFile" type="file" accept=".json,application/json" style="display:none" onchange="restore(event)"></div><hr style="border:0;border-top:1px solid var(--line);margin:18px 0"><p class="smalltext muted">Restoring replaces the current records with the backup file. Export the current data first if you need to keep it.</p>`)}
+function backup(){download('hostel-ledger-backup-'+today()+'.json',JSON.stringify(db,null,2),'application/json')}
+function restore(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.students||!x.payments||!x.charges||!x.expenses)throw Error();if(!confirm('Replace all current data with this backup?'))return;db=x;save();closeModal();toast('Backup restored')}catch(err){alert('Invalid backup file')}};r.readAsText(f)}
+function csv(rows){return rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n')}
+function downloadStudentCSV(){download('hostel-students.csv',csv([['Roll','Name','Room','Phone','Status','Charges','Paid','Due'],...db.students.map(s=>{let t=totals(s.roll);return [s.roll,s.name,s.room,s.phone,s.status,t.c,t.p,t.d]})]),'text/csv')}
+function downloadReportCSV(){let m=document.getElementById('reportMonth').value||'All time';let lines=[['Hostel Ledger Report',m],[],['Students','Roll','Name','Charges','Paid','Due'],...db.students.map(s=>{let t=totals(s.roll);return ['',s.roll,s.name,t.c,t.p,t.d]}),[],['Payments'],['Date','Roll','Name','Method','Note','Amount'],...db.payments.filter(x=>m==='All time'||monthOf(x.date)===m).map(x=>[x.date,x.roll,student(x.roll)?.name,x.method,x.note,x.amount]),[],['Expenses'],['Date','Category','Description','Account','Amount'],...db.expenses.filter(x=>m==='All time'||monthOf(x.date)===m).map(x=>[x.date,x.category,x.description,x.account,x.amount])];download('hostel-report.csv',csv(lines),'text/csv')}
+document.getElementById('todayLabel').textContent=new Date().toLocaleDateString('en-BD',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+load();renderAll();
+</script>
+</body>
+</html>
